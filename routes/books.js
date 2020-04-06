@@ -68,20 +68,12 @@ router.post('/', asyncHandler(async (req, res) => {
     }
   }));
 
-/* GET Delete book form. */
-router.get("/:id/delete", asyncHandler(async (req, res) => {
-  const book = await Book.findByPk(req.params.id);
-  if(book) {
-    res.render("books/delete", { book: book, title: "Delete Article" });
-  } else {
-    res.sendStatus(404);
-  }
-}));
 
 /* Delete individual article. */
 router.post('/:id/delete', asyncHandler(async (req ,res) => {
+  //find right book ID
   const book = await Book.findByPk(req.params.id);
-  console.log(book)
+  console.log("ID", req.params.id)
   if(book) {
     //delete from database
     await book.destroy();
