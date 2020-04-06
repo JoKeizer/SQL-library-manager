@@ -36,9 +36,8 @@ router.post('/', asyncHandler(async (req, res) => {
   } catch (error) {
     //show validatio
     if(error.name === "SequelizeValidationError") { // checking the error
-      //build sla op in database but rerender page
       book = await Book.build(req.body);
-      res.render("books/new-books", { book, errors: error.errors, title: "New Book" })
+      res.render("books/new-book", { book, errors: error.errors, title: "New Book" })
     } else {
       throw error; // error caught in the asyncHandler's catch block
     }
@@ -46,31 +45,31 @@ router.post('/', asyncHandler(async (req, res) => {
 }));
 
 //Get update-book route
-  router.get("/:id", asyncHandler(async (req, res) => {
-    const book = await Book.findByPk(req.params.id);
-    if(book) {
-      res.render('books/update-book', {book: book, title: 'Book Title'});
-    } else {
-      res.sendStatus(404)
-    }
-  }));
+router.get("/:id", asyncHandler(async (req, res) => {
+  const book = await Book.findByPk(req.params.id);
+  if(book) {
+    res.render('books/update-book', {book: book, title: 'Book Title'});
+  } else {
+    res.sendStatus(404)
+  }
+}));
 
-  /* POST update Book. */
-  router.post('/:id', asyncHandler(async (req, res) => {
-    //find book
-    const book = await Book.findByPk(req.params.id)
-    if(book) {
-      //Update the database
-      await book.update(req.body);
-      res.redirect("/books/");
-    } else {
-      res.sendStatus(404)
-    }
-  }));
+/* POST update Book. */
+router.post('/:id', asyncHandler(async (req, res) => {
+  //find book
+  const book = await Book.findByPk(req.params.id)
+  if(book) {
+    //Update the database
+    await book.update(req.body);
+    res.redirect("/books/");
+  } else {
+    res.sendStatus(404)
+  }
+}));
 
 
 /* Delete individual article. */
-router.post('/:id/delete', asyncHandler(async (req ,res) => {
+router.post('/books/:id/delete', asyncHandler(async (req ,res) => {
   //find right book ID
   const book = await Book.findByPk(req.params.id);
   console.log("ID", req.params.id)

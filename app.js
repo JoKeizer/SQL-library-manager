@@ -27,6 +27,19 @@ app.use('/books', booksRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
+
+});
+
+//middleware 404 page not found
+app.use((err, req, res, next) => {
+  res.locals.error = err;
+  res.status(err.status);
+  if(err.status === 404) {
+    res.render('books/page-not-found');
+    console.log(err.message)
+  } else {
+    res.render('error');
+  }
 });
 
 // error handler
