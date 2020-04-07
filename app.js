@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const { sequelize } = require('./models');
 
-
 var indexRouter = require('./routes/index');
 var booksRouter = require('./routes/books');
 
@@ -46,18 +45,7 @@ app.use(function(err, req, res, next) {
     console.log("this is the 500 or something else error:" , err)
     res.render('books/error.pug');
   }
-
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
 
 module.exports = app;

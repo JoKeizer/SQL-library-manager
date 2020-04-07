@@ -46,11 +46,21 @@ router.post('/new', asyncHandler(async (req, res) => {
 
 //Get update-book route
 router.get("/:id", asyncHandler(async (req, res) => {
-  const book = await Book.findByPk(req.params.id);
-  if(book) {
-    res.render('books/update-book', {book: book, title: 'Book Title'});
+  if(isNaN(parseInt(req.params.id))) {
+    throw error = {
+      status: 404,
+      message: "Sorry that book doesn't exist"
+    }
   } else {
-    res.sendStatus(404)
+    const book = await Book.findByPk(req.params.id);
+    if(book) {
+      res.render("books/update-book", { book, title: "Update Book"});
+    } else {
+      throw error = {
+        status: 500,
+        message: "Looks like the book your trying to update doesn't exist"
+      }
+    }
   }
 }));
 
@@ -59,13 +69,22 @@ router.post('/:id', asyncHandler(async (req, res) => {
   let book;
   //find book
   try {
-    book = await Book.findByPk(req.params.id)
-    if(book) {
-      //Update the database
-      await book.update(req.body);
-      res.redirect("/books/");
+
+    if(isNaN(parseInt(req.params.id))) {
+      throw error = {
+        status: 404,
+        message: "Sorry that book doesn't exist"
+      }
     } else {
-      res.sendStatus(404)
+      book = await Book.findByPk(req.params.id);
+      if(book) {
+        await book.update(req.body)
+        res.redirect("/");
+      }
+      throw error = {
+        status: 500,
+        message: "Looks like the book your trying to update doesn't exist"
+      }
     }
   } catch (error) {
     if( error.name === "SequelizeValidationError") {
