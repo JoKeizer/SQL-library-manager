@@ -27,22 +27,22 @@ router.get('/new', asyncHandler(async(req, res) => {
   res.render('books/new-book', {book: {}, title: 'New Book'});
 }));
 
-/* POST create Book. */
-router.post('/', asyncHandler(async (req, res) => {
+//post new book
+router.post('/new', asyncHandler(async (req, res) => {
   let book;
-  try{
+  try {
     book = await Book.create(req.body);
-    res.redirect("books");
+    res.redirect("/");
   } catch (error) {
-    //show validatio
-    if(error.name === "SequelizeValidationError") { // checking the error
+    if( error.name === "SequelizeValidationError") {
       book = await Book.build(req.body);
       res.render("books/new-book", { book, errors: error.errors, title: "New Book" })
     } else {
-      throw error; // error caught in the asyncHandler's catch block
+      throw error
     }
   }
 }));
+
 
 //Get update-book route
 router.get("/:id", asyncHandler(async (req, res) => {
@@ -56,20 +56,32 @@ router.get("/:id", asyncHandler(async (req, res) => {
 
 /* POST update Book. */
 router.post('/:id', asyncHandler(async (req, res) => {
+  let book;
   //find book
-  const book = await Book.findByPk(req.params.id)
-  if(book) {
-    //Update the database
-    await book.update(req.body);
-    res.redirect("/books/");
-  } else {
-    res.sendStatus(404)
+  try {
+    book = await Book.findByPk(req.params.id)
+    if(book) {
+      //Update the database
+      await book.update(req.body);
+      res.redirect("/books/");
+    } else {
+      res.sendStatus(404)
+    }
+  } catch (error) {
+    if( error.name === "SequelizeValidationError") {
+      book = await Book.build(req.body);
+      book.id = req.params.id
+      res.render("books/update-book", { book, errors: error.errors, title: "Update Books"});
+    } else {
+      throw error;
+    }
   }
+
 }));
 
 
 /* Delete individual article. */
-router.post('/books/:id/delete', asyncHandler(async (req ,res) => {
+router.post('/:id/delete', asyncHandler(async (req ,res) => {
   //find right book ID
   const book = await Book.findByPk(req.params.id);
   console.log("ID", req.params.id)
@@ -81,5 +93,8 @@ router.post('/books/:id/delete', asyncHandler(async (req ,res) => {
     res.sendStatus(404)
   }
 }));
+
+
+
 
 module.exports = router;
