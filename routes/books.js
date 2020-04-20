@@ -45,24 +45,26 @@ router.post('/new', asyncHandler(async (req, res) => {
 
 
 //Get update-book route
-router.get("/:id", asyncHandler(async (req, res) => {
-  if(isNaN(parseInt(req.params.id))) {
-    throw error = {
-      status: 404,
-      message: "Sorry that book doesn't exist"
-    }
-  } else {
-    const book = await Book.findByPk(req.params.id);
-    if(book) {
-      res.render("books/update-book", { book, title: "Update Book"});
+router.get(
+    "/:id",
+    asyncHandler(async (req, res, next) => {
+      const book = await Book.findByPk(req.params.id);
+      handleRenderGet("books/update-book", req, res, book, "Update Book", next);
+    })
+);
+
+// function to handle rendering from any page except home page
+function handleRenderGet(view, req, res, book, title, next = null) {
+  try {
+    if (book) {
+      res.render(view, { book, title: title });
     } else {
-      throw error = {
-        status: 500,
-        message: "Looks like the book your trying to update doesn't exist"
-      }
+      res.render("error-page-not-found", {});
     }
+  } catch (error) {
+    res.status(500).send(error);
   }
-}));
+}
 
 /* POST update Book. */
 router.post('/:id', asyncHandler(async (req, res) => {
